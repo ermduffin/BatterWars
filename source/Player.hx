@@ -1,23 +1,38 @@
 package;
 
+import flixel.effects.particles.FlxEmitter;
+import flixel.system.FlxSound;
+import Projectile;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.util.FlxSpriteUtil;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.FlxObject;
 
 class Player extends FlxSprite {
-    public var speed:Float = 200; // player walkspeed
-    var _facing:Float = 0; // direction the player is facing
+    public var SPEED:Float = 200; // player walkspeed
+    public var flickering:Bool = false;
+    private var _projectiles:FlxTypedGroup<Projectile>;
+    private var shootSound:FlxSound;
+    private var _gibs:FlxEmitter;
     
     override public function update(elapsed:Float) {
         movement(); // call movement every frame
+		shoot();
         super.update(elapsed);
     }
-
+    
+    override public function kill() {
+        super.kill();
+        _gibs.focusOn(this);
+        _gibs.start();
+    }
+    
     //constructor
-    public function new(?X:Float=0, ?Y:Float=0) {
+    public function new(?X:Float=0, ?Y:Float=0, projectiles:FlxTypedGroup<Projectile>, gibs:FlxEmitter) {
         super(X,Y);
         // add the animations to player
-		loadGraphic(AssetPaths.player_spritesheet__png,true,64,64);
+		loadGraphic(AssetPaths.player_spritesheet__png,true,30,42);
         animation.add("idleleft",[0,1],2,true,true);
         animation.add("idleright",[0,1],2,true);
 		animation.add("walkleft",[2,3,4,5,6,7],10,true,true);
@@ -27,6 +42,11 @@ class Player extends FlxSprite {
         drag.y = 200;
         animation.play("idle");
         health = 30;
+
+        _projectiles = projectiles;
+        _gibs = gibs;
+
+        shootSound = FlxG.sound.load(AssetPaths.playershoot__wav);
     }
 
     function movement() {
@@ -46,15 +66,15 @@ class Player extends FlxSprite {
         velocity.x = 0;
 
         if (left)
-            velocity.x = -100;
+            velocity.x = -250;
         if (right)
-            velocity.x = 100;
+            velocity.x = 250;
         if (FlxG.keys.justPressed.W && isTouching(FlxObject.DOWN)) {
             if (animation.curAnim == animation.getByName("idleleft"))
                 animation.play("walkleft");
             else if (animation.curAnim == animation.getByName("idleright"))
                 animation.play("walkright");
-            velocity.y = -150;
+            velocity.y = -330;
         }
 
         // if movement key pressed, start an animation
@@ -67,11 +87,11 @@ class Player extends FlxSprite {
             else if (down)
                 animation.play("walkdown");
             else if (left) {
-                _facing = 180;
+                facing = LEFT;
                 animation.play("walkleft");
             }
             else if (right) {
-                _facing = 0;
+                facing = RIGHT;
                 animation.play("walkright");
             }
         }
@@ -92,11 +112,11 @@ class Player extends FlxSprite {
             else if(down)
                 animation.play("walkdown");
             else if (left) {
-                _facing = 180;
+                facing = LEFT;
                 animation.play("walkleft");
             }
             else if (right) {
-                _facing = 0;
+                facing = RIGHT;
                 animation.play("walkright");
             }
             else if (FlxG.keys.justReleased.A)
@@ -106,8 +126,19 @@ class Player extends FlxSprite {
 		}
     }
 
-    // get the direction the player is facing
-    public function getFacing():Float {
-        return _facing;
+    override public function hurt(damage:Float) {
+        if (FlxSpriteUtil.isFlickering(this))
+            return;
+        FlxSpriteUtil.flicker(this, 1, 0.05, true, true);
+        super.hurt(damage);
     }
+
+    private function shoot() {
+		// mouse click shoots a projectile
+		if (FlxG.mouse.justPressed) {
+			// create a new projectile with a course between the player and the mouse
+			_projectiles.add(new Projectile(this, ProjectileType.PANCAKE));
+            shootSound.play();
+		}
+	}
 }

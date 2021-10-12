@@ -1,9 +1,11 @@
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 
 enum ProjectileType {
     PANCAKE;
     BATTER;
+    BATTERBOMB;
 }
 
 class Projectile extends FlxSprite {
@@ -13,21 +15,32 @@ class Projectile extends FlxSprite {
 
     public function new(shooter:FlxSprite, type:ProjectileType) {
         _type = type;
-        // set color of projectile and damage based on type
+        // set image of projectile and damage based on type
         switch (_type) {
             case PANCAKE:
-                super(shooter.getMidpoint().x, shooter.getMidpoint().y, AssetPaths.pancake_bullet__png);
-//                if (shooter.getFacing() == 180)
-//                    flipX = true;
+                super(shooter.x, shooter.y, AssetPaths.pancake_bullet__png);
+                _movementSpeed = -500;
+                if (shooter.facing == LEFT) {
+                    flipX = true;
+                    _movementSpeed *= -1;
+                }
                 _damage = 10;
-                _movementSpeed = 300;
+                velocity.set(_movementSpeed, 0);
             case BATTER:
-                super(shooter.getMidpoint().x, shooter.getMidpoint().y, AssetPaths.batter_bullet__png);
+                super(shooter.x, shooter.y, AssetPaths.batter_bullet__png);
                 _damage = 5;
-                _movementSpeed = 150;
+                _movementSpeed = 300;
+                if (shooter.facing == RIGHT) {
+                    flipX = true;
+                    _movementSpeed *= -1;
+                }
+                velocity.set(_movementSpeed, 0);
+            case BATTERBOMB:
+                super(FlxG.random.int(1280,2080), 608, AssetPaths.batter_bullet__png);
+                angle = -90;
+                _movementSpeed = -300;
+                velocity.set(0, _movementSpeed);
         }
-        // set movement speed
-        velocity.set(_movementSpeed, 0);
         velocity.rotate(FlxPoint.weak(0,0), 180);
     }
 
