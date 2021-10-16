@@ -11,6 +11,7 @@ import flixel.FlxState;
 class GameOverState extends FlxState {
     private var name:FlxText;
     private var startButton:FlxButton;
+    private var menuButton:FlxButton;
     private var quitButton:FlxButton;
 
     override public function create() {
@@ -25,13 +26,23 @@ class GameOverState extends FlxState {
             });
         });
         startButton.screenCenter();
+        startButton.y -= 30;
         add(startButton);
+
+        menuButton = new FlxButton(0,0,"Menu",function(){
+            FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
+                FlxG.sound.playMusic(AssetPaths.OrigamiRepetikaKindGentleBeautifulPerson__ogg,0.5,true);
+                FlxG.switchState(new MenuState());
+            });
+        });
+        menuButton.screenCenter();
+        add(menuButton);
 
         quitButton = new FlxButton(0,0,"Quit",function(){
             System.exit(0);
         });
         quitButton.screenCenter();
-        quitButton.y += 20;
+        quitButton.y += 30;
         add(quitButton);
 
         FlxG.sound.playMusic(AssetPaths.GigakoopsTheClosingofChaos__ogg,0.5,true);

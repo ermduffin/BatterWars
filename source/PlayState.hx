@@ -1,5 +1,6 @@
 package;
 
+import flixel.addons.display.FlxBackdrop;
 import flixel.effects.particles.FlxEmitter;
 import flixel.system.FlxSound;
 import openfl.system.System;
@@ -27,6 +28,7 @@ class PlayState extends FlxState {
 	private var _boss:Boss;
 	private var _bossArms:FlxTypedGroup<BossArm>;
 	private var _bossProjectiles:FlxTypedGroup<Projectile>;
+	private var _bossWave:FlxSprite;
 	private var _lives:FlxTypedGroup<FlxSprite>;
 	private var _bossLives:FlxTypedGroup<FlxSprite>;
 	private var _hud:FlxTypedGroup<FlxTypedGroup<FlxSprite>>;
@@ -35,13 +37,14 @@ class PlayState extends FlxState {
 
 	override public function create() {
 		super.create();
-		FlxG.cameras.bgColor = 0xFF94CAE6;
 		FlxG.worldBounds.set(0, 0, 3200, 1600);
+		var backdrop = new FlxBackdrop(AssetPaths.background__png, 1, 1, false, false);
+		add(backdrop);
+
 		_level = new FlxTilemap();
 		var tiledMap = new TiledMap("assets/data/tile_map.tmx");
 		var layer = cast(tiledMap.getLayer("Tile Layer 1"), TiledTileLayer);
 		_level.loadMapFromArray(layer.tileArray, layer.width, layer.height, "assets/images/tile_map.png", 32, 32, FlxTilemapAutoTiling.OFF, 1);
-		add(_level);
 
 		_gibs = new FlxEmitter();
 		_gibs.velocity.set(-150, -200, 150, 0);
@@ -52,20 +55,25 @@ class PlayState extends FlxState {
 		add(_gibs);
 
 		_projectiles = new FlxTypedGroup<Projectile>();
-		add(_projectiles);
 
-	//	_player = new Player(192,1410,_projectiles, _gibs);
-		_player = new Player(2176,256,_projectiles, _gibs);
+		_player = new Player(192,1410,_projectiles, _gibs);
+	//	_player = new Player(2176,256,_projectiles, _gibs);
 		FlxG.camera.target = _player;
-		
+
 		_boss = new Boss(1600, 675, _player, _gibs);
 		_bossArms = _boss._arms;
 		_bossProjectiles = _boss._projectiles;
+		_bossWave = _boss._wave;
+
 		add(_boss);
 		add(_bossArms);
 		add(_bossProjectiles);
+		add(_bossWave);
+		
+		add(_level);
 
 		add(_player);
+		add(_projectiles);
 
 		_hud = new FlxTypedGroup<FlxTypedGroup<FlxSprite>>();
 		_lives = new FlxTypedGroup<FlxSprite>();
@@ -81,8 +89,8 @@ class PlayState extends FlxState {
 		}
 		_hud.add(_lives);
 
-		// give the boss 50 lives
-		for (i in 0...50)
+		// give the boss 40 lives
+		for (i in 0...40)
 		{
 			_bossLives.add(new FlxSprite(300 - i * 3, 20));
 			_bossLives.members[i].makeGraphic(3, 10, FlxColor.RED);
@@ -121,7 +129,9 @@ class PlayState extends FlxState {
 		FlxG.collide(_monsters, _projectiles, hit);
 		FlxG.collide(_player, _monsterProjectiles, loseLife);
 		FlxG.collide(_player, _bossProjectiles, loseLife);
+		FlxG.overlap(_player, _bossArms, loseLife);
 		FlxG.collide(_player, _bossArms, loseLife);
+		FlxG.collide(_player, _bossWave, loseLife);
 		FlxG.collide(_bossArms, _projectiles, loseBossLife);
 		FlxG.collide(_projectiles, _level, function(projectile:Projectile, level:FlxTilemap){
 			projectile.exists = false;
@@ -133,7 +143,7 @@ class PlayState extends FlxState {
 			projectile.exists = false;
 		});
 
-		if (_player.x > 1952 && _player.x < 2080 && _player.y < 576 && _player.y > 416)
+		if (_player.x > 1920 && _player.x < 2112 && _player.y < 576 && _player.y > 416)
 			startBossFight();
 
 		if (FlxG.keys.justPressed.ESCAPE)
@@ -209,8 +219,13 @@ class PlayState extends FlxState {
 		FlxSpriteUtil.flicker(_boss, 1, 0.05, true, true);
 		if (_bossLives.getFirstExisting() != null)
 			_bossLives.getFirstExisting().exists = false;
-		if (_bossLives.getFirstExisting() == null)
+		if (_bossLives.getFirstExisting() == null) {
 			_boss.kill();
+			FlxG.camera.fade(FlxColor.BLACK, 2, false, function(){
+                FlxG.switchState(new WinState());
+            });
+		}
+			
 		_hitSound.play();
 	}
 	

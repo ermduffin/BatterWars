@@ -10,8 +10,10 @@
 --macro keep('IntIterator')
 -cp C:/HaxeToolkit/haxe/lib/hscript/2,4,0
 -D hscript=2.4.0
--cp C:/HaxeToolkit/haxe/lib/flixel-addons/2,11,0
+-cp C:/HaxeToolkit/haxe/lib/flixel-addons/git
 -D flixel-addons=2.11.0
+-cp C:/HaxeToolkit/haxe/lib/flixel-ui/git
+-D flixel-ui=2.4.0
 -cp source
 -D tools=7.9.0
 -D lime-canvas

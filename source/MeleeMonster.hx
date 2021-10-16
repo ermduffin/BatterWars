@@ -20,7 +20,7 @@ class MeleeMonster extends FlxSprite {
     private var _movement_speed:Float;
     private var _target:FlxObject;
     private var ATTACK_RANGE:Float = 400;
-    private var ATTACK_RANGE_Y:Float = 300;
+    private var ATTACK_RANGE_Y:Float = 100;
     private var _timer:FlxTimer;
     public var _projectiles:FlxTypedGroup<Projectile>;
     private var shootSound:FlxSound;
@@ -85,7 +85,7 @@ class MeleeMonster extends FlxSprite {
         _gibs.focusOn(this);
         _gibs.start();
     }
-    
+
     private function AI(timer:FlxTimer):Void {
         switch (_type) {
             case CHIPPY:
@@ -113,9 +113,11 @@ class MeleeMonster extends FlxSprite {
     }
 
     private function shoot() {
-        _projectiles.add(new Projectile(this, ProjectileType.BATTER));
-        animation.play("idle");
-        shootSound.play();
+        if (exists) {
+            _projectiles.add(new Projectile(this, ProjectileType.BATTER));
+            animation.play("idle");
+            shootSound.play();
+        }
     }
     public function getDamagePerSecond():Float {
         return _damage_per_second;
