@@ -13,11 +13,10 @@ enum MonsterType {
     GLOBBY;
 }
 
-class MeleeMonster extends FlxSprite {
+class Monster extends FlxSprite {
     private var _type:MonsterType;
-    private var _damage_per_second:Float;
-    private var _armor:Float;
     private var _movement_speed:Float;
+    // the target that the monster will attack
     private var _target:FlxObject;
     private var ATTACK_RANGE:Float = 400;
     private var ATTACK_RANGE_Y:Float = 100;
@@ -31,7 +30,6 @@ class MeleeMonster extends FlxSprite {
         _type = type;
         _target = target;
         _timer = new FlxTimer();
-        //drag.x = 100;
         acceleration.y = 400;
         drag.y = 200;
         _projectiles = projectiles;
@@ -40,8 +38,6 @@ class MeleeMonster extends FlxSprite {
         switch(_type) {
             case CHIPPY:
                 health = 30;
-                _damage_per_second = 5;
-                _armor = 10;
                 _movement_speed = 150;
                 loadGraphic(AssetPaths.chip_spritesheet__png,true,29,34);
                 animation.add("idle",[0,1,2,3],2,true);
@@ -49,8 +45,6 @@ class MeleeMonster extends FlxSprite {
 		        animation.add("walkright",[8,9,10,11],10,true);
             case GLOBBY:
                 health = 20;
-                _damage_per_second = 5;
-                _armor = 10;
                 _movement_speed = 0;
                 loadGraphic(AssetPaths.globby_spritesheet__png,true,57,40);
                 animation.add("idle",[0,1],2,true);
@@ -118,8 +112,5 @@ class MeleeMonster extends FlxSprite {
             animation.play("idle");
             shootSound.play();
         }
-    }
-    public function getDamagePerSecond():Float {
-        return _damage_per_second;
     }
 }
