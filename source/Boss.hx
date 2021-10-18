@@ -35,8 +35,8 @@ class Boss extends FlxSprite {
 
         // add arms to boss, first is left arm, second is right arm
         _arms = new FlxTypedGroup<BossArm>();
-        _arms.add(new BossArm(1637, 848));
-        _arms.add(new BossArm(1919, 848));
+        _arms.add(new BossArm(1797, 848));
+        _arms.add(new BossArm(2079, 848));
 
         // add wave attack
         _wave = new FlxSprite(0,0);
@@ -146,7 +146,8 @@ class Boss extends FlxSprite {
         }, 2000);
         Timer.delay(function(){
             if(_wave.exists)
-                _wave.setPosition(1100,855);
+                _wave.visible = true;
+                _wave.setPosition(1260,855);
         }, 3000);
         // to avoid collision bugs when resetting the wave position
         Timer.delay(function(){
@@ -155,7 +156,8 @@ class Boss extends FlxSprite {
         }, 3250);
         Timer.delay(function(){
             if(_wave.exists)
+                _wave.visible = false;
                 _wave.solid = false;
-        }, 13000);
+        }, 8500);
     }
 }

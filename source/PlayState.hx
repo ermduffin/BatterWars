@@ -37,8 +37,10 @@ class PlayState extends FlxState {
 
 	override public function create() {
 		super.create();
-		FlxG.worldBounds.set(0, 0, 3200, 1600);
+		FlxG.mouse.visible = false;
+		FlxG.worldBounds.set(0, 0, 3520, 1920);
 		var backdrop = new FlxBackdrop(AssetPaths.background__png, 1, 1, false, false);
+		backdrop.x += 160;
 		add(backdrop);
 
 		_level = new FlxTilemap();
@@ -56,11 +58,11 @@ class PlayState extends FlxState {
 
 		_projectiles = new FlxTypedGroup<Projectile>();
 
-		_player = new Player(192,1410,_projectiles, _gibs);
-	//	_player = new Player(2176,256,_projectiles, _gibs);
+		_player = new Player(352,1410,_projectiles, _gibs);
+	//	_player = new Player(2336,256,_projectiles, _gibs);
 		FlxG.camera.target = _player;
 
-		_boss = new Boss(1600, 675, _player, _gibs);
+		_boss = new Boss(1760, 675, _player, _gibs);
 		_bossArms = _boss._arms;
 		_bossProjectiles = _boss._projectiles;
 		_bossWave = _boss._wave;
@@ -105,15 +107,15 @@ class PlayState extends FlxState {
 
 		_monsters = new FlxTypedGroup<MeleeMonster>();
 		_monsterProjectiles = new FlxTypedGroup<Projectile>();
-		_monsters.add(new MeleeMonster(600,1402,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(1504,1312,_player,GLOBBY,_monsterProjectiles,_gibs));
-		_monsters.add(new MeleeMonster(1664,1402,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(2464,1402,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(2752,1216,_player,GLOBBY,_monsterProjectiles,_gibs));
-		_monsters.add(new MeleeMonster(2880,1120,_player,GLOBBY,_monsterProjectiles,_gibs));
-		_monsters.add(new MeleeMonster(2336,1024,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(2848,602,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(2240,256,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new MeleeMonster(760,1402,_player,CHIPPY,null,_gibs));
+		_monsters.add(new MeleeMonster(1664,1312,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new MeleeMonster(1824,1402,_player,CHIPPY,null,_gibs));
+		_monsters.add(new MeleeMonster(2624,1402,_player,CHIPPY,null,_gibs));
+		_monsters.add(new MeleeMonster(2912,1216,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new MeleeMonster(3040,1120,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new MeleeMonster(2496,1024,_player,CHIPPY,null,_gibs));
+		_monsters.add(new MeleeMonster(3008,602,_player,CHIPPY,null,_gibs));
+		_monsters.add(new MeleeMonster(2400,256,_player,GLOBBY,_monsterProjectiles,_gibs));
 		add(_monsters);
 		add(_monsterProjectiles);
 
@@ -143,7 +145,7 @@ class PlayState extends FlxState {
 			projectile.exists = false;
 		});
 
-		if (_player.x > 1920 && _player.x < 2112 && _player.y < 576 && _player.y > 416)
+		if (_player.x > 2080 && _player.x < 2272 && _player.y < 576 && _player.y > 416)
 			startBossFight();
 
 		if (FlxG.keys.justPressed.ESCAPE)

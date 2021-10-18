@@ -36,7 +36,7 @@ class Projectile extends FlxSprite {
                 }
                 velocity.set(_movementSpeed, 0);
             case BATTERBOMB:
-                super(FlxG.random.int(1440,2080), 608, AssetPaths.batter_bullet__png);
+                super(FlxG.random.int(1600,2240), 608, AssetPaths.batter_bullet__png);
                 angle = -90;
                 _movementSpeed = -300;
                 velocity.set(0, _movementSpeed);
