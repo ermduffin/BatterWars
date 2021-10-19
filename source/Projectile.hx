@@ -15,7 +15,7 @@ class Projectile extends FlxSprite {
 
     public function new(shooter:FlxSprite, type:ProjectileType) {
         _type = type;
-        // set image of projectile and damage based on type
+        // set image of projectile, movement speed and damage based on type
         switch (_type) {
             case PANCAKE:
                 super(shooter.x, shooter.y, AssetPaths.pancake_bullet__png);
@@ -28,7 +28,6 @@ class Projectile extends FlxSprite {
                 velocity.set(_movementSpeed, 0);
             case BATTER:
                 super(shooter.x, shooter.y, AssetPaths.batter_bullet__png);
-                _damage = 5;
                 _movementSpeed = 300;
                 if (shooter.facing == RIGHT) {
                     flipX = true;
@@ -36,6 +35,7 @@ class Projectile extends FlxSprite {
                 }
                 velocity.set(_movementSpeed, 0);
             case BATTERBOMB:
+                // give the batter bomb a random starting position within the boss fight area
                 super(FlxG.random.int(1600,2240), 608, AssetPaths.batter_bullet__png);
                 angle = -90;
                 _movementSpeed = -300;

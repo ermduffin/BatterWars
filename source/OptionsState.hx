@@ -1,6 +1,5 @@
 package;
 
-import openfl.system.System;
 import flixel.util.FlxColor;
 import flixel.util.FlxAxes;
 import flixel.FlxG;
@@ -9,6 +8,7 @@ import flixel.text.FlxText;
 import flixel.FlxState;
 import flixel.addons.ui.FlxUICheckBox;
 
+// displayed when the options button in the main menu is pressed
 class OptionsState extends FlxState {
     private var name:FlxText;
     private var fullscreenName:FlxText;
@@ -27,17 +27,20 @@ class OptionsState extends FlxState {
         fullscreenName.y -= 20;
         add(fullscreenName);
 
+        // create a checkbox for the fullscreen option
         fullscreenBox = new FlxUICheckBox(0,0,null,null,"Fullscreen",100,null,function(){
+            // set the game window to fullscreen
             FlxG.fullscreen = fullscreenBox.checked;
             if (FlxG.fullscreen)
                 FlxG.resizeWindow(600,450);
         });
-        fullscreenBox.checked = true;
+        fullscreenBox.checked = FlxG.fullscreen;
         fullscreenBox.screenCenter();
         fullscreenBox.x += 100;
         fullscreenBox.y -= 20;
         add(fullscreenBox);
         
+        // return to the main menu after menu button is pressed
         menuButton = new FlxButton(0,0,"Menu",function(){
             FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
                 FlxG.switchState(new MenuState());

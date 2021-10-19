@@ -1,6 +1,5 @@
 package;
 
-import haxe.rtti.CType.Rights;
 import flixel.effects.particles.FlxEmitter;
 import flixel.system.FlxSound;
 import Projectile;
@@ -11,27 +10,22 @@ import flixel.FlxG;
 import flixel.FlxObject;
 
 class Player extends FlxSprite {
-    public var SPEED:Float = 200; // player walkspeed
+    // player movement speed
+    public var SPEED:Float = 250;
     public var flickering:Bool = false;
+
+    // player's pancake projectiles
     private var _projectiles:FlxTypedGroup<Projectile>;
     private var shootSound:FlxSound;
+
+    // gibs that are emitted when the player dies
     private var _gibs:FlxEmitter;
+
+    // true if the player is moving left
     private var left:Bool;
+    // true if the player is moving left
     private var right:Bool;
-    private var curAnimName:String;
-    
-    override public function update(elapsed:Float) {
-        movement(); // call movement every frame
-		shoot();
-        super.update(elapsed);
-    }
-    
-    override public function kill() {
-        super.kill();
-        _gibs.focusOn(this);
-        _gibs.start();
-    }
-    
+
     //constructor
     public function new(?X:Float=0, ?Y:Float=0, projectiles:FlxTypedGroup<Projectile>, gibs:FlxEmitter) {
         super(X,Y);
@@ -45,49 +39,63 @@ class Player extends FlxSprite {
         animation.add("idleshootright",[8,9],8,false);
         animation.add("walkshootleft",[10,11],8,false,true);
         animation.add("walkshootright",[10,11],8,false);
-        // add drag to the player so he stops when movement keys are released
+        // add drag to the player so she is affected by gravity
         acceleration.y = 500;
         drag.y = 200;
         animation.play("idleright");
-        health = 30;
 
         _projectiles = projectiles;
         _gibs = gibs;
 
+        // load the sound for shooting a pancake bullet
         shootSound = FlxG.sound.load(AssetPaths.playershoot__wav);
     }
 
-    // add to check when touching down and not moving
+    override public function update(elapsed:Float) {
+        movement();
+		shoot();
+        super.update(elapsed);
+    }
+    
+    // make the player explode into gibs when he is killed
+    override public function kill() {
+        super.kill();
+        _gibs.focusOn(this);
+        _gibs.start();
+    }
+
+    // for handling player's movement and movement animations
     function movement() {
-        // key is pressed
         left = FlxG.keys.pressed.A;
         right = FlxG.keys.pressed.D;
 
-        // if left and right are pressed, don't move
+        // if keys for left and right movement are pressed, don't move
         if (left && right)
             left = right = false;
 
         velocity.x = 0;
 
-        // handle movement
+        // move left or right
         if (left)
-            velocity.x = -250;
+            velocity.x = -SPEED;
         if (right)
-            velocity.x = 250;
+            velocity.x = SPEED;
 
         // handle animation when landing
-        if(justTouched(FlxObject.DOWN) && !left && !right) {
-            if (facing == LEFT)
+        if(justTouched(FlxObject.DOWN)) {
+            // if not moving and facing left, idle
+            if (facing == LEFT && !left && !right)
                 animation.play("idleleft");
-            else if (facing == RIGHT)
+            // if not moving and facing right, idle
+            else if (facing == RIGHT && !left && !right)
                 animation.play("idleright");
-        }
-        else if (justTouched(FlxObject.DOWN) && (left || right)) {
-            if (left) {
+            // play left animation if moving left
+            else if (left) {
                 animation.reset();
                 animation.play("walkleft");
                 facing = LEFT;
             }
+            // play right animation if moving right
             else if (right) {
                 animation.reset();
                 animation.play("walkright");
@@ -95,7 +103,9 @@ class Player extends FlxSprite {
             }
         }
         
+        // handle animations when the player is on the ground
         if (isTouching(FlxObject.DOWN)) {
+            // if any of the shooting animations just played, start a new animation
             if (animation.curAnim.finished){
                 if (left) {
                     animation.play("walkleft");
@@ -146,6 +156,7 @@ class Player extends FlxSprite {
                     animation.pause();
                     animation.frameIndex = 3;
                 }
+                // move  up
                 velocity.y = -330;
             }
 
@@ -170,6 +181,7 @@ class Player extends FlxSprite {
         }
     }
 
+    // flicker the player if damaged
     override public function hurt(damage:Float) {
         if (FlxSpriteUtil.isFlickering(this))
             return;
@@ -180,23 +192,21 @@ class Player extends FlxSprite {
     private function shoot() {
 		// mouse click shoots a projectile
 		if (FlxG.mouse.justPressed) {
-			// create a new projectile with a course between the player and the mouse
+			// shoot a projectile 
 			_projectiles.add(new Projectile(this, ProjectileType.PANCAKE));
             shootSound.play();
-            curAnimName = animation.curAnim.name;
+
+            // handle the shooting animations
+            // if shooting while moving or in the air
             if (left || facing == LEFT && !isTouching(FlxObject.DOWN))
                 animation.play("walkshootleft");
             else if (right || facing == RIGHT && !isTouching(FlxObject.DOWN))
                 animation.play("walkshootright");
+            // if shooting while idling
             else if (facing == LEFT)
                 animation.play("idleshootleft");
             else if (facing == RIGHT)
                 animation.play("idleshootright");
 		}
 	}
-
- //   private function restartPreviousAnim(?name:String) {
- //       animation.play(curAnimName);
- //       animation.frameIndex = 1;
- //   }
 }

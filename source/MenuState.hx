@@ -8,6 +8,7 @@ import flixel.FlxG;
 import flixel.FlxState;
 import flixel.ui.FlxButton;
 
+// displayed on game startup
 class MenuState extends FlxState {
     private var name:FlxText;
     private var startButton:FlxButton;
@@ -22,6 +23,7 @@ class MenuState extends FlxState {
         name.screenCenter(FlxAxes.X);
         add(name);
 
+        // enter the play state after start button is pressed
         startButton = new FlxButton(0,0,"Start",function(){
             FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
                 FlxG.switchState(new PlayState());
@@ -31,6 +33,7 @@ class MenuState extends FlxState {
         startButton.y -= 45;
         add(startButton);
 
+        // enter the credits state after credits button is pressed
         creditsButton = new FlxButton(0,0,"Credits",function(){
             FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
                 FlxG.switchState(new CreditsState());
@@ -40,6 +43,7 @@ class MenuState extends FlxState {
         creditsButton.y -= 15;
         add(creditsButton);
 
+        // enter the options state after options button is pressed
         optionsButton = new FlxButton(0,0,"Options",function(){
             FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
                 FlxG.switchState(new OptionsState());
@@ -49,6 +53,7 @@ class MenuState extends FlxState {
         optionsButton.y += 15;
         add(optionsButton);
 
+        // exit the game after quit button is pressed
         quitButton = new FlxButton(0,0,"Quit",function(){
             System.exit(0);
         });

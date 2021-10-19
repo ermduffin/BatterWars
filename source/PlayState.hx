@@ -21,7 +21,7 @@ import BossArm;
 
 class PlayState extends FlxState {
 	private var _projectiles:FlxTypedGroup<Projectile>;
-	private var _monsters:FlxTypedGroup<MeleeMonster>;
+	private var _monsters:FlxTypedGroup<Monster>;
 	private var _monsterProjectiles:FlxTypedGroup<Projectile>;
 	private var _level:FlxTilemap;
 	private var _player:Player;
@@ -31,7 +31,6 @@ class PlayState extends FlxState {
 	private var _bossWave:FlxSprite;
 	private var _lives:FlxTypedGroup<FlxSprite>;
 	private var _bossLives:FlxTypedGroup<FlxSprite>;
-	private var _hud:FlxTypedGroup<FlxTypedGroup<FlxSprite>>;
 	private var _hitSound:FlxSound;
 	private var _gibs:FlxEmitter;
 
@@ -39,15 +38,18 @@ class PlayState extends FlxState {
 		super.create();
 		FlxG.mouse.visible = false;
 		FlxG.worldBounds.set(0, 0, 3520, 1920);
+		// create the background
 		var backdrop = new FlxBackdrop(AssetPaths.background__png, 1, 1, false, false);
 		backdrop.x += 160;
 		add(backdrop);
 
+		// create the level from the tiled map
 		_level = new FlxTilemap();
 		var tiledMap = new TiledMap("assets/data/tile_map.tmx");
 		var layer = cast(tiledMap.getLayer("Tile Layer 1"), TiledTileLayer);
 		_level.loadMapFromArray(layer.tileArray, layer.width, layer.height, "assets/images/tile_map.png", 32, 32, FlxTilemapAutoTiling.OFF, 1);
 
+		// create the gibs
 		_gibs = new FlxEmitter();
 		_gibs.velocity.set(-150, -200, 150, 0);
 		_gibs.angularVelocity.set(-700);
@@ -56,12 +58,19 @@ class PlayState extends FlxState {
 		_gibs.makeParticles();
 		add(_gibs);
 
+		// the player's projectiles
 		_projectiles = new FlxTypedGroup<Projectile>();
 
+		// create the player at the start of the level
 		_player = new Player(352,1410,_projectiles, _gibs);
-	//	_player = new Player(2336,256,_projectiles, _gibs);
+
+		// player position for testing the boss fight
+		// _player = new Player(2336,256,_projectiles, _gibs);
+		
+		// focus the camera on the player
 		FlxG.camera.target = _player;
 
+		// create the boss and his attacks
 		_boss = new Boss(1760, 675, _player, _gibs);
 		_bossArms = _boss._arms;
 		_bossProjectiles = _boss._projectiles;
@@ -77,9 +86,11 @@ class PlayState extends FlxState {
 		add(_player);
 		add(_projectiles);
 
-		_hud = new FlxTypedGroup<FlxTypedGroup<FlxSprite>>();
+		// the player's lives
 		_lives = new FlxTypedGroup<FlxSprite>();
+		// the boss's lives
 		_bossLives = new FlxTypedGroup<FlxSprite>();
+
 		// give the player 3 lives
 		for (i in 0...3)
 		{
@@ -89,10 +100,10 @@ class PlayState extends FlxState {
 			_lives.members[i].scrollFactor.set(0,0);
 			_lives.members[i].camera = FlxG.camera;
 		}
-		_hud.add(_lives);
+		add(_lives);
 
-		// give the boss 40 lives
-		for (i in 0...40)
+		// give the boss 30 lives
+		for (i in 0...30)
 		{
 			_bossLives.add(new FlxSprite(300 - i * 3, 20));
 			_bossLives.members[i].makeGraphic(3, 10, FlxColor.RED);
@@ -100,41 +111,45 @@ class PlayState extends FlxState {
 			_bossLives.members[i].scrollFactor.set(0,0);
 			_bossLives.members[i].camera = FlxG.camera;
 		}
-		_hud.add(_bossLives);
+		add(_bossLives);
+		// hide the boss's lives until the boss fight starts
 		_bossLives.visible = false;
 
-		add(_hud);
-
-		_monsters = new FlxTypedGroup<MeleeMonster>();
+		// create all the monsters for the level
+		_monsters = new FlxTypedGroup<Monster>();
 		_monsterProjectiles = new FlxTypedGroup<Projectile>();
-		_monsters.add(new MeleeMonster(760,1402,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(1664,1312,_player,GLOBBY,_monsterProjectiles,_gibs));
-		_monsters.add(new MeleeMonster(1824,1402,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(2624,1402,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(2912,1216,_player,GLOBBY,_monsterProjectiles,_gibs));
-		_monsters.add(new MeleeMonster(3040,1120,_player,GLOBBY,_monsterProjectiles,_gibs));
-		_monsters.add(new MeleeMonster(2496,1024,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(3008,602,_player,CHIPPY,null,_gibs));
-		_monsters.add(new MeleeMonster(2400,256,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new Monster(760,1402,_player,CHIPPY,null,_gibs));
+		_monsters.add(new Monster(1664,1312,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new Monster(1824,1402,_player,CHIPPY,null,_gibs));
+		_monsters.add(new Monster(2624,1402,_player,CHIPPY,null,_gibs));
+		_monsters.add(new Monster(2912,1216,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new Monster(3040,1120,_player,GLOBBY,_monsterProjectiles,_gibs));
+		_monsters.add(new Monster(2496,1024,_player,CHIPPY,null,_gibs));
+		_monsters.add(new Monster(3008,602,_player,CHIPPY,null,_gibs));
+		_monsters.add(new Monster(2400,256,_player,GLOBBY,_monsterProjectiles,_gibs));
 		add(_monsters);
 		add(_monsterProjectiles);
 
         FlxG.sound.playMusic(AssetPaths.OrigamiRepetikaSunnyMorningExerciseClub__ogg,0.5,true);
+		// load the sound for a character taking damage
 		_hitSound = FlxG.sound.load(AssetPaths.hurt__wav);
 	}
 
 	override public function update(elapsed:Float):Void {
+		_player.velocity.x = 0;
+
+		// collisions
 		FlxG.collide(_level, _player);
 		FlxG.collide(_level, _monsters);
-        _player.velocity.x = 0;
-		FlxG.collide(_monsters, _player, meleeHit);
 		FlxG.collide(_monsters, _projectiles, hit);
+		FlxG.collide(_player, _monsters, loseLife);
 		FlxG.collide(_player, _monsterProjectiles, loseLife);
 		FlxG.collide(_player, _bossProjectiles, loseLife);
 		FlxG.overlap(_player, _bossArms, loseLife);
 		FlxG.collide(_player, _bossArms, loseLife);
 		FlxG.collide(_player, _bossWave, loseLife);
 		FlxG.collide(_bossArms, _projectiles, loseBossLife);
+		// remove the player's monsters' and boss's projectiles when they hit a wall
 		FlxG.collide(_projectiles, _level, function(projectile:Projectile, level:FlxTilemap){
 			projectile.exists = false;
 		});
@@ -145,64 +160,55 @@ class PlayState extends FlxState {
 			projectile.exists = false;
 		});
 
+		// start boss fight if the player drops through the passage leading up to the fight
 		if (_player.x > 2080 && _player.x < 2272 && _player.y < 576 && _player.y > 416)
 			startBossFight();
 
+		// exit the game if escape key is pressed
 		if (FlxG.keys.justPressed.ESCAPE)
 			System.exit(0);
 
 		super.update(elapsed);
 	}
 
-// useful if there are pickups for handling both pickup collision and level collision
-//	private function onCollisionWithPlayer(object:FlxObject, player:Player) {
-//		FlxObject.separate(object,player);
-//	}
-
+	// when a monster is hit by one of the player's projectiles
 	private function hit(entity:FlxSprite, projectile:Projectile) {
-		// remove the projectile once it hits a monster
+		// remove the projectile
 		projectile.exists = false;
 		// the monster takes damage based on the damage dealt by the projectile
 		entity.hurt(projectile.getDamage());
-		// entity is pushed back by the projectile
+		// monster is pushed back by the projectile
 		entity.velocity.x = 4 * entity.velocity.x;
+		// stop the entity being pushed back
 		Timer.delay(function(){
 			entity.velocity.x = 0;
 		}, 100);
 		_hitSound.play();
 	}
-
-	private function meleeHit(monster:MeleeMonster, player:Player) {
-		monster.velocity.x = -8 * monster.velocity.x;
-		if (FlxSpriteUtil.isFlickering(player))
-            return;
-        FlxSpriteUtil.flicker(player, 1, 0.05, true, true);
-		if (_lives.getFirstExisting() != null)
-			_lives.getFirstExisting().exists = false;
-		if (_lives.getFirstExisting() == null) {
-			player.kill();
-			FlxG.camera.fade(FlxColor.BLACK, 2, false, function(){
-                FlxG.switchState(new GameOverState());
-            });
-		}
-		Timer.delay(stopBounce.bind(monster), 100);
-		_hitSound.play();
-	}
-
-	private function stopBounce(monster:MeleeMonster) {
-		monster.velocity.x = -monster.velocity.x / 8;
-	}
 	
+	// when the player is hit by a monster
 	private function loseLife(player:Player, sprite:FlxSprite)
 	{
-		// remove the projectile once it hits the player
+		// if sprite is a projectile, remove the projectile
 		if (Std.isOfType(sprite, Projectile))
 			sprite.exists = false;
+		// if sprite is a monster, bounce the monster backwards
+		else if (Std.isOfType(sprite, Monster)) {
+			sprite.velocity.x = -8 * sprite.velocity.x;
+			// stop the monster's backward bounce
+			Timer.delay(function(){
+				sprite.velocity.x = -sprite.velocity.x / 8;
+			}, 100);
+		}
+
+		// if player is flickering she cannot take damage
 		if (FlxSpriteUtil.isFlickering(player))
             return;
+		// flicker the player for one second
         FlxSpriteUtil.flicker(player, 1, 0.05, true, true);
 		if (_lives.getFirstExisting() != null)
 			_lives.getFirstExisting().exists = false;
+		// if no more lives kill the player and switch to game over state
 		if (_lives.getFirstExisting() == null) {
 			player.kill();
 			FlxG.camera.fade(FlxColor.BLACK, 2, false, function(){
@@ -212,30 +218,32 @@ class PlayState extends FlxState {
 		_hitSound.play();
 	}
 
+	// when the boss is hit by one of the player's projectiles
 	private function loseBossLife(bossArm:BossArm, projectile:Projectile)
 	{
-		// remove the projectile once it hits the boss arm
+		// remove the projectile
 		projectile.exists = false;
+		// if boss is flickering he cannot take damage
 		if (FlxSpriteUtil.isFlickering(_boss))
 			return;
+		// flicker the boss for one second
 		FlxSpriteUtil.flicker(_boss, 1, 0.05, true, true);
 		if (_bossLives.getFirstExisting() != null)
 			_bossLives.getFirstExisting().exists = false;
+		// if no more lives kill the boss and switch to win state
 		if (_bossLives.getFirstExisting() == null) {
 			_boss.kill();
 			FlxG.camera.fade(FlxColor.BLACK, 2, false, function(){
                 FlxG.switchState(new WinState());
             });
 		}
-			
 		_hitSound.play();
 	}
 	
+	// start the boss fight
 	private function startBossFight() {
 		FlxG.camera.flash(FlxColor.WHITE, 3);
-	//	FlxG.camera.shake(0.01, 3);
 		_bossLives.visible = true;
-		//_hud add boss health bar: 50 hits?
 		FlxG.sound.playMusic(AssetPaths.sawsquarenoiseBossTheme__ogg,0.5,true);
 	}
 }

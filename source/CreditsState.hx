@@ -7,6 +7,7 @@ import flixel.ui.FlxButton;
 import flixel.text.FlxText;
 import flixel.FlxState;
 
+// displayed when the credits button in the main menu is pressed
 class CreditsState extends FlxState {
     private var name:FlxText;
     private var creatorName:FlxText;
@@ -19,11 +20,6 @@ class CreditsState extends FlxState {
     private var soundDesignerName4:FlxText;
     private var menuButton:FlxButton;
 
-
-// monstershoot made by Morgan Purkis
-// playershoot by Natty23
-// hurt by sharesynth
-// slam by severaltimes
     override public function create() {
         FlxG.mouse.visible = true;
         name = new FlxText(0,0,0,"Credits",50,true);
@@ -71,6 +67,7 @@ class CreditsState extends FlxState {
         add(soundDesignerName4);
         
         menuButton = new FlxButton(0,0,"Menu",function(){
+            // return to the main menu after menu button is pressed
             FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
                 FlxG.switchState(new MenuState());
             });

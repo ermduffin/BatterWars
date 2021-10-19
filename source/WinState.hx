@@ -8,6 +8,7 @@ import flixel.ui.FlxButton;
 import flixel.text.FlxText;
 import flixel.FlxState;
 
+// displayed when the player kills the boss
 class WinState extends FlxState {
     private var name:FlxText;
     private var startButton:FlxButton;
@@ -20,6 +21,7 @@ class WinState extends FlxState {
         name.screenCenter(FlxAxes.X);
         add(name);
 
+        // return to the play state after play again button is pressed
         startButton = new FlxButton(0,0,"Play Again",function(){
             FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
                 FlxG.switchState(new PlayState());
@@ -29,6 +31,7 @@ class WinState extends FlxState {
         startButton.y -= 30;
         add(startButton);
 
+        // return to the main menu after menu button is pressed
         menuButton = new FlxButton(0,0,"Menu",function(){
             FlxG.camera.fade(FlxColor.BLACK, 0.5, false, function(){
                 FlxG.switchState(new MenuState());
@@ -37,6 +40,7 @@ class WinState extends FlxState {
         menuButton.screenCenter();
         add(menuButton);
 
+        // exit the game after quit button is pressed
         quitButton = new FlxButton(0,0,"Quit",function(){
             System.exit(0);
         });
